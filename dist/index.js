@@ -32546,7 +32546,7 @@ class TerraformModule {
         if (this.tags.length === 0) {
             return null;
         }
-        return this.tags[0].replace(`${this.name}/`, '');
+        return this.tags[0].replace(`${this.name}-`, '');
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Releases
@@ -32783,14 +32783,14 @@ class TerraformModule {
      */
     extractVersionFromTag(tag) {
         // Validate tag format - must start with module name followed by slash
-        if (!tag.startsWith(`${this.name}/`)) {
-            throw new Error(`Invalid tag format: '${tag}'. Expected format: '${this.name}/v#.#.#' or '${this.name}/#.#.#' for module.`);
+        if (!tag.startsWith(`${this.name}-`)) {
+            throw new Error(`Invalid tag format: '${tag}'. Expected format: '${this.name}-v#.#.#' or '${this.name}-#.#.#' for module.`);
         }
-        // Extract everything after the last slash
-        const versionPart = tag.substring(tag.lastIndexOf('/') + 1);
+        // Extract everything after the last -
+        const versionPart = tag.substring(tag.lastIndexOf('-') + 1);
         // Validate that the version part matches the expected format
         if (!VERSION_TAG_REGEX.test(versionPart)) {
-            throw new Error(`Invalid tag format: '${tag}'. Expected format: '${this.name}/v#.#.#' or '${this.name}/#.#.#' for module.`);
+            throw new Error(`Invalid tag format: '${tag}'. Expected format: '${this.name}-v#.#.#' or '${this.name}-#.#.#' for module.`);
         }
         // Return only the numerical part, stripping the 'v' prefix if present
         return versionPart.startsWith('v') ? versionPart.substring(1) : versionPart;
@@ -32922,7 +32922,7 @@ class TerraformModule {
      */
     static isModuleAssociatedWithTag(moduleName, tag) {
         // Check if tag starts with exactly the module name followed by a slash
-        if (!tag.startsWith(`${moduleName}/`)) {
+        if (!tag.startsWith(`${moduleName}-`)) {
             return false;
         }
         // Extract the version part after the module name and slash

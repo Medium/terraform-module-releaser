@@ -217,7 +217,7 @@ export class TerraformModule {
       return null;
     }
 
-    return this.tags[0].replace(`${this.name}/`, '');
+    return this.tags[0].replace(`${this.name}-`, '');
   }
 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -480,19 +480,19 @@ export class TerraformModule {
    */
   private extractVersionFromTag(tag: string): string {
     // Validate tag format - must start with module name followed by slash
-    if (!tag.startsWith(`${this.name}/`)) {
+    if (!tag.startsWith(`${this.name}-`)) {
       throw new Error(
-        `Invalid tag format: '${tag}'. Expected format: '${this.name}/v#.#.#' or '${this.name}/#.#.#' for module.`,
+        `Invalid tag format: '${tag}'. Expected format: '${this.name}-v#.#.#' or '${this.name}-#.#.#' for module.`,
       );
     }
 
-    // Extract everything after the last slash
-    const versionPart = tag.substring(tag.lastIndexOf('/') + 1);
+    // Extract everything after the last -
+    const versionPart = tag.substring(tag.lastIndexOf('-') + 1);
 
     // Validate that the version part matches the expected format
     if (!VERSION_TAG_REGEX.test(versionPart)) {
       throw new Error(
-        `Invalid tag format: '${tag}'. Expected format: '${this.name}/v#.#.#' or '${this.name}/#.#.#' for module.`,
+        `Invalid tag format: '${tag}'. Expected format: '${this.name}-v#.#.#' or '${this.name}-#.#.#' for module.`,
       );
     }
 
@@ -636,7 +636,7 @@ export class TerraformModule {
    */
   public static isModuleAssociatedWithTag(moduleName: string, tag: string): boolean {
     // Check if tag starts with exactly the module name followed by a slash
-    if (!tag.startsWith(`${moduleName}/`)) {
+    if (!tag.startsWith(`${moduleName}-`)) {
       return false;
     }
 
