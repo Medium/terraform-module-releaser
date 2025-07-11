@@ -636,7 +636,7 @@ export class TerraformModule {
    */
   public static isModuleAssociatedWithTag(moduleName: string, tag: string): boolean {
     // Check if tag starts with exactly the module name followed by a slash
-    if (!tag.startsWith(`${moduleName}/`)) {
+    if (!tag.startsWith(`${moduleName}-`)) {
       return false;
     }
 

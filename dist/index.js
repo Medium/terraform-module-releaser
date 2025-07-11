@@ -32922,7 +32922,7 @@ class TerraformModule {
      */
     static isModuleAssociatedWithTag(moduleName, tag) {
         // Check if tag starts with exactly the module name followed by a slash
-        if (!tag.startsWith(`${moduleName}/`)) {
+        if (!tag.startsWith(`${moduleName}-`)) {
             return false;
         }
         // Extract the version part after the module name and slash
