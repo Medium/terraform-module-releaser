@@ -36678,6 +36678,8 @@ async function createTaggedReleases(terraformModules) {
             copyModuleContents(module.directory, tmpDir, config.moduleAssetExcludePatterns);
             // Copy the module's .git directory
             (0,external_node_fs_namespaceObject.cpSync)((0,external_node_path_namespaceObject.join)(workspaceDir, '.git'), (0,external_node_path_namespaceObject.join)(tmpDir, '.git'), { recursive: true });
+            // Copy the module's .github directory
+            (0,external_node_fs_namespaceObject.cpSync)((0,external_node_path_namespaceObject.join)(workspaceDir, '.github'), (0,external_node_path_namespaceObject.join)(tmpDir, '.github'), { recursive: true });
             // Git operations: commit the changes and tag the release
             const commitMessage = `${module.getReleaseTag()}\n\n${prTitle}\n\n${prBody}`.trim();
             const gitPath = await lib_default()('git');

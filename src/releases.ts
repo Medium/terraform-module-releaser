@@ -137,6 +137,9 @@ export async function createTaggedReleases(terraformModules: TerraformModule[]):
       // Copy the module's .git directory
       cpSync(join(workspaceDir, '.git'), join(tmpDir, '.git'), { recursive: true });
 
+      // Copy the module's .github directory
+      cpSync(join(workspaceDir, '.github'), join(tmpDir, '.github'), { recursive: true });
+
       // Git operations: commit the changes and tag the release
       const commitMessage = `${module.getReleaseTag()}\n\n${prTitle}\n\n${prBody}`.trim();
       const gitPath = await which('git');
