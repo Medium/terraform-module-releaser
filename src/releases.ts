@@ -1,7 +1,7 @@
 import { type ExecSyncOptions, execFileSync } from 'node:child_process';
-import { cpSync, mkdtempSync } from 'node:fs';
+import { cpSync, mkdirSync ,mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, join } from 'node:path';
 import { createTerraformModuleChangelog } from '@/changelog';
 import { config } from '@/config';
 import { context } from '@/context';
@@ -131,11 +131,19 @@ export async function createTaggedReleases(terraformModules: TerraformModule[]):
       const tmpDir = mkdtempSync(join(tmpdir(), `${fileSystemSafeModuleName}-`));
       info(`Created temp directory: ${tmpDir}`);
 
-      // Copy the entire repository contents
-      cpSync(workspaceDir, tmpDir, {
-        recursive: true,
-        dereference: true,
-      });
+      // Create a subdirectory using the module folder name (e.g., 'auth')
+      const moduleFolderName = basename(module.directory);
+      const moduleDestDir = join(tmpDir, moduleFolderName);
+      mkdirSync(moduleDestDir, { recursive: true });
+
+      // Copy the module's contents into tmpDir/moduleFolderName
+      copyModuleContents(module.directory, moduleDestDir, config.moduleAssetExcludePatterns);
+
+      // Copy the module's .git directory
+      cpSync(join(workspaceDir, '.git'), join(tmpDir, '.git'), { recursive: true });
+
+      // Copy the module's .github directory
+      cpSync(join(workspaceDir, '.github'), join(tmpDir, '.github'), { recursive: true });
 
       // Git operations: commit the changes and tag the release
       const commitMessage = `${module.getReleaseTag()}\n\n${prTitle}\n\n${prBody}`.trim();
