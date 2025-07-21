@@ -131,14 +131,11 @@ export async function createTaggedReleases(terraformModules: TerraformModule[]):
       const tmpDir = mkdtempSync(join(tmpdir(), `${fileSystemSafeModuleName}-`));
       info(`Created temp directory: ${tmpDir}`);
 
-      // Copy the module's contents to the temporary directory, excluding specified patterns
-      copyModuleContents(module.directory, tmpDir, config.moduleAssetExcludePatterns);
-
-      // Copy the module's .git directory
-      cpSync(join(workspaceDir, '.git'), join(tmpDir, '.git'), { recursive: true });
-
-      // Copy the module's .github directory
-      cpSync(join(workspaceDir, '.github'), join(tmpDir, '.github'), { recursive: true });
+      // Copy the entire repository contents
+      cpSync(workspaceDir, tmpDir, {
+        recursive: true,
+        dereference: true,
+      });
 
       // Git operations: commit the changes and tag the release
       const commitMessage = `${module.getReleaseTag()}\n\n${prTitle}\n\n${prBody}`.trim();
