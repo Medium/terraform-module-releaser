@@ -34971,24 +34971,24 @@ function shouldExcludeFile(relativeFilePath, excludePatterns) {
 function copyModuleContents(directory, tmpDir, excludePatterns, baseDirectory) {
     const baseDir = baseDirectory ?? directory;
     // Read the directory contents
-    const filesToCopy = (0,external_node_fs_namespaceObject.readdirSync)(directory);
-    (0,core.info)(`Copying "${directory}" to directory: ${tmpDir}`);
+    const filesToCopy = readdirSync(directory);
+    info(`Copying "${directory}" to directory: ${tmpDir}`);
     for (const file of filesToCopy) {
-        const filePath = (0,external_node_path_namespaceObject.join)(directory, file);
-        const stats = (0,external_node_fs_namespaceObject.statSync)(filePath);
+        const filePath = join(directory, file);
+        const stats = statSync(filePath);
         if (stats.isDirectory()) {
             // If the item is a directory, create the directory in tmpDir and copy its contents
-            const newDir = (0,external_node_path_namespaceObject.join)(tmpDir, file);
-            (0,external_node_fs_namespaceObject.mkdirSync)(newDir, { recursive: true });
+            const newDir = join(tmpDir, file);
+            mkdirSync(newDir, { recursive: true });
             // Note: Important we pass the original base directory.
             copyModuleContents(filePath, newDir, excludePatterns, baseDir); // Recursion for directory contents
         }
-        else if (!shouldExcludeFile((0,external_node_path_namespaceObject.relative)(baseDir, filePath), excludePatterns).shouldExclude) {
+        else if (!shouldExcludeFile(relative(baseDir, filePath), excludePatterns).shouldExclude) {
             // Handle file copying
-            (0,external_node_fs_namespaceObject.copyFileSync)(filePath, (0,external_node_path_namespaceObject.join)(tmpDir, file));
+            copyFileSync(filePath, join(tmpDir, file));
         }
         else {
-            (0,core.info)(`Excluding file: ${filePath}`);
+            info(`Excluding file: ${filePath}`);
         }
     }
 }
@@ -36580,8 +36580,6 @@ async function addPostReleaseComment(releasedTerraformModules) {
 
 
 
-
-
 /**
  * Retrieves all releases from the specified GitHub repository.
  *
@@ -36674,12 +36672,11 @@ async function createTaggedReleases(terraformModules) {
             const fileSystemSafeModuleName = module.name.replace(/\//g, '-');
             const tmpDir = (0,external_node_fs_namespaceObject.mkdtempSync)((0,external_node_path_namespaceObject.join)((0,external_node_os_namespaceObject.tmpdir)(), `${fileSystemSafeModuleName}-`));
             (0,core.info)(`Created temp directory: ${tmpDir}`);
-            // Copy the module's contents to the temporary directory, excluding specified patterns
-            copyModuleContents(module.directory, tmpDir, config.moduleAssetExcludePatterns);
-            // Copy the module's .git directory
-            (0,external_node_fs_namespaceObject.cpSync)((0,external_node_path_namespaceObject.join)(workspaceDir, '.git'), (0,external_node_path_namespaceObject.join)(tmpDir, '.git'), { recursive: true });
-            // Copy the module's .github directory
-            (0,external_node_fs_namespaceObject.cpSync)((0,external_node_path_namespaceObject.join)(workspaceDir, '.github'), (0,external_node_path_namespaceObject.join)(tmpDir, '.github'), { recursive: true });
+            // Copy the entire repository contents
+            (0,external_node_fs_namespaceObject.cpSync)(workspaceDir, tmpDir, {
+                recursive: true,
+                dereference: true,
+            });
             // Git operations: commit the changes and tag the release
             const commitMessage = `${module.getReleaseTag()}\n\n${prTitle}\n\n${prBody}`.trim();
             const gitPath = await lib_default()('git');
